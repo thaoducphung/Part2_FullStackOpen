@@ -19,6 +19,7 @@ const Persons = ({persons,personService,setPersons}) => {
                 })
                 .catch(err => {
                     // const person = persons.find(n => n.id === id)
+                    
                     alert(
                         `Failed to delete '${person.name}' from the server`
                     )
