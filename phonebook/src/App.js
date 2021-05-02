@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
+import personService from './services/persons'
 
 const App = () => {
   // const [persons, setPersons] = useState([
@@ -16,30 +17,56 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
 
-  const hook = () => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(res => {
-        setPersons(res.data)
-      })
-  }
-  useEffect(hook,[])
+  // const hook = () => {
+  //   axios
+  //     .get('http://localhost:3001/persons')
+  //     .then(res => {
+  //       setPersons(res.data)
+  //     })
+  // }
+  // useEffect(hook,[])
+
+  useEffect(()=>{
+    personService
+      .getAll()
+      .then(initialPersons => setPersons(initialPersons))
+  },[])
 
   const addPerson = (event) => {
     event.preventDefault()
     // console.log('button clicked', event.target)
     // Create new person object
-    const found = persons.some(element => element.name === newName)
-    if (found === true) {
-      window.alert(`${newName} is already added to phonebook`)
+    // const found = persons.some(element => element.name.toLowerCase() === newName.toLowerCase())
+    const found = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
+    console.log('found',found)
+    if (found) {
+      // window.alert(`${newName} is already added to phonebook`)
+      const addChange = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+      if (addChange) {
+        const personChange = {
+          ...found,
+          number: newNumber
+        }
+        personService
+          .update(found.id,personChange)
+          .then(returnedPerson => {
+            setPersons(persons.map(person=> person.id !== found.id ? person : returnedPerson))
+          })
+      }
     } else {
       const personObject = {
         name: newName,
-        number: newNumber
+        number: newNumber,
+        id: persons.length + 1
       }
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      
+      personService
+        .create(personObject)
+        .then(returnedPersons => {
+          setPersons(persons.concat(personObject))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
@@ -75,7 +102,11 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={peopleFilters}/>
+      <Persons 
+        persons={peopleFilters}
+        personService={personService}
+        setPersons={setPersons}
+      />
     </div>
   )
 }
