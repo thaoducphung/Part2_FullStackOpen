@@ -4,7 +4,7 @@ import React from 'react'
 //     return (<div>{person.name} {person.number}</div>)
 // }
 
-const Persons = ({persons,personService,setPersons}) => {
+const Persons = ({persons,personService,setPersons,setMessage,setErrorStatus}) => {
     const handleDelete = (id) => {
         console.log(`delete ${id}`)
         const person = persons.find(n => n.id === id)
@@ -20,9 +20,16 @@ const Persons = ({persons,personService,setPersons}) => {
                 .catch(err => {
                     // const person = persons.find(n => n.id === id)
                     
-                    alert(
-                        `Failed to delete '${person.name}' from the server`
-                    )
+                    // alert(
+                    //     `Failed to delete '${person.name}' from the server`
+                    // )
+                    setMessage(person.name)
+                    setErrorStatus(true)
+                    setPersons(persons.filter(person => person.id !== id))
+                    setTimeout(()=>{
+                        setMessage(null)
+                        setErrorStatus(false)
+                      }, 2000)
                 })
         }
         

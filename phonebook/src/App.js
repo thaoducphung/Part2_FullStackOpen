@@ -4,6 +4,8 @@ import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import personService from './services/persons'
+import Notification from './components/Notification'
+import './index.css'
 
 const App = () => {
   // const [persons, setPersons] = useState([
@@ -16,7 +18,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
-
+  const [message, setMessage] = useState(null)
+  const [errorStatus, setErrorStatus] = useState(false)
   // const hook = () => {
   //   axios
   //     .get('http://localhost:3001/persons')
@@ -66,6 +69,13 @@ const App = () => {
           setPersons(persons.concat(personObject))
           setNewName('')
           setNewNumber('')
+          
+          setMessage(newName)
+          setErrorStatus(false)
+
+          setTimeout(()=>{
+            setMessage(null)
+          }, 2000)
         })
     }
   }
@@ -87,7 +97,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+        <Notification message={message} error={errorStatus}/>
         <Filter value={searchName} onChange={handleSearchName}/>
 
       <h3>Add a new</h3>
@@ -106,6 +116,8 @@ const App = () => {
         persons={peopleFilters}
         personService={personService}
         setPersons={setPersons}
+        setMessage={setMessage}
+        setErrorStatus={setErrorStatus}
       />
     </div>
   )
